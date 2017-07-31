@@ -11,7 +11,7 @@ namespace DiscordBot
 {
     class MyBot
     {
-        string botToken = "MzM0NTEyNjEyMTQ4NjQxNzky.DEepsw.SeJB6mfSO-gWs36vwcBaVUy-PX0";
+        string botToken = "[Your Token Here]";
         DiscordClient discord;
 
         public MyBot()
