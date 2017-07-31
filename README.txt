@@ -7,6 +7,6 @@ Usage:
 
 |rtd [NumberOfDice] [SidesOfDice] [Modifier]
 
-So to roll 3 6-sided with a modifier of +3 execute:
+So to roll 3 6-sided dice with a modifier of +3 execute:
 |rtd 3 6 +3
 
