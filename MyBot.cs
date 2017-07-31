@@ -50,14 +50,6 @@ namespace DiscordBot
                     await e.Channel.SendMessage("Pong");
                 });
 
-            commands.CreateCommand("Truth") //Command here (Remember prefix)
-                .Do(async (e) =>
-                {
-                    //Do stuff here
-                    await e.Channel.SendMessage("Life isn't real");
-
-                });
-
             commands.CreateCommand("rtd").Parameter("Number", ParameterType.Required).Parameter("Sides", ParameterType.Required).Parameter("Modifier", ParameterType.Optional) //Command here (Remember prefix)
                 .Do(async(e) =>
                 {
