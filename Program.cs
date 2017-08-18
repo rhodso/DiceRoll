@@ -118,8 +118,7 @@ namespace DiceRoll
         {
             Console.WriteLine(DateTime.Now.TimeOfDay.Hours.ToString("00") + ":" + DateTime.Now.TimeOfDay.Minutes.ToString("00") + ":" + DateTime.Now.TimeOfDay.Seconds.ToString("00") + " " + "{0}", message);
         }
-
-
+        
     }
     public class Info : ModuleBase
     {
@@ -128,17 +127,6 @@ namespace DiceRoll
         {
             string name;
             ConsoleLog("Running ping command...");
-
-            if (((Context.Message.Author as SocketGuildUser).Nickname != null))
-            {
-                name = (Context.Message.Author as SocketGuildUser).Nickname;
-            }
-            else
-            {
-                name = Context.Message.Author.Username;
-            };
-            
-            await ReplyAsync(name);
             await ReplyAsync("Pong!");
         }
 
@@ -155,7 +143,6 @@ namespace DiceRoll
             //Get the name of the person who sent the command
             string name = Context.Message.Author.Username;
 
-
             if (((Context.Message.Author as SocketGuildUser).Nickname != null))
             {
                 name = (Context.Message.Author as SocketGuildUser).Nickname;
@@ -170,7 +157,6 @@ namespace DiceRoll
             {
                 int collation = Convert.ToInt32(rtd(sidesint, modint, numberint));
                 string resultStr = collation.ToString();
-
 
                 if (numberint != 1)
                 {
@@ -198,13 +184,9 @@ namespace DiceRoll
             rnd = new Random().Next(1, sidesint + 1);
             rnd = rnd + modint;
             string resultStr = rnd.ToString();
-
             return resultStr;
         }
 
     }
-
-    
-    
 
 }
