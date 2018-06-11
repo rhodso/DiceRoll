@@ -29,6 +29,12 @@ public class Program
         StreamReader file = new StreamReader(Environment.CurrentDirectory + "\\Token.txt");
         string token = file.ReadLine();
 
+        if(token == null)
+        {
+            ConsoleLog("Token not present in file. Terminating process...");
+            Environment.Exit(38);
+        }
+
         ConsoleLog("Token established");
 
             commands = new CommandService();
@@ -117,7 +123,7 @@ public class Program
         [Command("Ping"), Summary("Pings the bot to see if it's working")]
         public async Task Ping()
         {
-            string name;
+            //string name;
             ConsoleLog("Running ping command...");
             await ReplyAsync("Pong!");
         }

@@ -44,7 +44,8 @@ C:\Users\Richard\Documents\!Programming\C#\DiceRoll\DiceRoll\DiceRoll\bin\Debug\
 C:\Users\Richard\Documents\!Programming\C#\DiceRoll\DiceRoll\DiceRoll\bin\Debug\System.Collections.Immutable.xml
 C:\Users\Richard\Documents\!Programming\C#\DiceRoll\DiceRoll\DiceRoll\bin\Debug\System.Diagnostics.DiagnosticSource.xml
 C:\Users\Richard\Documents\!Programming\C#\DiceRoll\DiceRoll\DiceRoll\bin\Debug\System.Interactive.Async.xml
-C:\Users\Richard\Documents\!Programming\C#\DiceRoll\DiceRoll\DiceRoll\obj\Debug\DiceRoll.csprojResolveAssemblyReference.cache
 C:\Users\Richard\Documents\!Programming\C#\DiceRoll\DiceRoll\DiceRoll\obj\Debug\DiceRoll.csproj.CoreCompileInputs.cache
 C:\Users\Richard\Documents\!Programming\C#\DiceRoll\DiceRoll\DiceRoll\obj\Debug\DiceRoll.exe
 C:\Users\Richard\Documents\!Programming\C#\DiceRoll\DiceRoll\DiceRoll\obj\Debug\DiceRoll.pdb
+C:\Users\Richard\Documents\!Programming\C#\DiceRoll\DiceRoll\DiceRoll\obj\Debug\DiceRoll.csprojAssemblyReference.cache
+C:\Users\Richard\Documents\!Programming\C#\DiceRoll\DiceRoll\DiceRoll\obj\Debug\DiceRoll.csproj.CopyComplete
