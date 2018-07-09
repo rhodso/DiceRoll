@@ -6,10 +6,10 @@ You will need to create this file in the root directory
 
 Usage:
 
-|rtd [NumberOfDice] [SidesOfDice] [Modifier]
+|rtd [NumberOfDice] [SidesOfDice]
 
-So to roll 3 6-sided dice with a modifier of +3 execute:
-|rtd 3 6 +3
+So to roll 3 6-sided dice, execute:
+|rtd 3 6
 
 If you want to set this up for your server, then go read the wiki!
 Feel free to leave feedback!
