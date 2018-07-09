@@ -5,6 +5,7 @@ from discord.ext.commands import Bot
 from discord.ext import commands
 import platform
 import datetime
+import random
 
 #Set prefix character
 prefix = "|"
@@ -45,10 +46,59 @@ async def on_message(message):
         #   End with:
         #   await client.send_message(client.get_channel(message.channel.id), [Message (result of command)])
 
+        #Help command
+        if(message.content == (prefix + "help")):
+            log("Running help command...")
+            await client.send_message(client.get_channel(message.channel.id),'Usage: |rtd [NumberOfDice] [SidesOfDice] [Modifier]')
+
+        #Ping command
         if(message.content == (prefix + "ping")):
             log("Running ping command...")
             await client.send_message(client.get_channel(message.channel.id), 'Pong!')
 
+        #RollTheDice Command
+        if(message.content[:4] == (prefix + "rtd")):
+            log("Running DiceRoll command...")
+            
+            #Split string
+            SplitMessage = message.content.split(" ")
+            
+            #   1 = Number of dice
+            #   2 = Sides of dice
+            #   3 = Modifier
+
+            #Setup vars so not out of scope when it runs
+            NoOfDice = 1
+            SidesOfDice = 100
+            DiceModifier = "+0"
+
+            try:
+                #Try to parse parameters
+                NoOfDice = int(SplitMessage[1])
+                SidesOfDice = int(SplitMessage[2])
+                DiceModifier = str(SidesOfDice[3])
+
+            except:
+                #Catch exception
+                log("Something went wrong in rtd command. Parameters probably not typed correctly")
+
+                #Tell the user to check their parameters 
+                await client.send_message(client.get_channel(message.channel.id), 'Something went wrong, did you type the parameters correctly?')
+                
+                #If there's only 1 dice, no need to add up and give total
+                if(NoOfDice == 1):
+                    await client.send_message(client.get_channel(message.channel.id), 'You rolled a ' + random.randint(1,SidesOfDice) + '!')
+                else:
+                #Add the dice up and give total
+                    for i in range (1,SidesOfDice):
+                        #Roll the dice and tell the user what they rolled
+                        roll = random.randint(1,SidesOfDice)
+                        await client.send_message(client.get_channel(message.channel.id), 'You rolled a ' + roll + '!')
+                        #Add roll to total
+                        total = total + roll
+                    #Output total
+                    await client.send_message(client.get_channel(message.channel.id), 'Your total is ' + total + '!')      
+        
     else:
         #Message is not a command, ignore
         pass
