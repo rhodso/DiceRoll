@@ -32,26 +32,26 @@ async def on_ready():
     log('Ready!')
     return await client.change_presence(game=discord.Game(name='with dice')) 
 
-
-##Commands
-#@client.command()
-#async def ping(*args):
-#    log("Runing ping command...")
-#    await client.say('Pong!')
-
-#async def rtd(*args):
-#    log("Running rtd command...")
-#    await client.say("WIP")
-
+#Commands
 @client.event
 async def on_message(message):
     if(message.content[:1] == prefix):
-        
+        #If message starts with the prefix, it's a command. Handle it as such
+
+        #Command structure:
+        #if(message.content == (prefix + "[Command Invoker]")):
+        #   log("Running [Command name] command...")
+        #   Do stuff
+        #   End with:
+        #   await client.send_message(client.get_channel(message.channel.id), [Message (result of command)])
+
         if(message.content == (prefix + "ping")):
             log("Running ping command...")
-            await client.send_message(client.get_channel(), 'Pong!')
+            await client.send_message(client.get_channel(message.channel.id), 'Pong!')
 
     else:
+        #Message is not a command, ignore
         pass
 
+#Run bot
 client.run(str(getToken()))
