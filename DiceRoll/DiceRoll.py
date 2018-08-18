@@ -78,29 +78,29 @@ async def on_message(message):
                 NoOfDice = int(SplitMessage[1])
                 SidesOfDice = int(SplitMessage[2])
 
+                #If there's only 1 dice, no need to add up and give total
+                if(NoOfDice == 1):
+                    await client.send_message(client.get_channel(message.channel.id), 'You rolled a ' + str(random.randint(1,SidesOfDice)) + '!')
+                else:
+                    total = 0
+                    #Add the dice up and give total
+                    
+                    for i in range (0,NoOfDice):
+                        #Roll the dice and tell the user what they rolled
+                        roll = random.randint(1,SidesOfDice-1)
+                        await client.send_message(client.get_channel(message.channel.id), 'You rolled a ' + str(roll) + '!')
+                        #Add roll to total
+                        total = total + roll
+                    
+                        #Output total
+                    await client.send_message(client.get_channel(message.channel.id), 'Your total is ' + str(total) + '!')      
+            
             except:
                 #Catch exception
                 log("Something went wrong in rtd command. Parameters probably not typed correctly")
-
                 #Tell the user to check their parameters 
                 await client.send_message(client.get_channel(message.channel.id), 'Something went wrong, did you type the parameters correctly?')
-                
-            
-            #If there's only 1 dice, no need to add up and give total
-            if(NoOfDice == 1):
-                await client.send_message(client.get_channel(message.channel.id), 'You rolled a ' + str(random.randint(1,SidesOfDice)) + '!')
-            else:
-                total = 0
-                #Add the dice up and give total
-                for i in range (0,NoOfDice):
-                    #Roll the dice and tell the user what they rolled
-                    roll = random.randint(1,NoOfDice)
-                    await client.send_message(client.get_channel(message.channel.id), 'You rolled a ' + str(roll) + '!')
-                    #Add roll to total
-                    total = total + roll
-            #Output total
-            await client.send_message(client.get_channel(message.channel.id), 'Your total is ' + str(total) + '!')      
-        
+
     else:
         #Message is not a command, ignore
         pass
