@@ -28,11 +28,12 @@ client = Bot(description='', command_prefix=prefix, pm_help = False)
 @client.event
 async def on_ready():
     log('Initialising...')
-    log('Logged in as '+client.user.name+' (ID:'+client.user.id+') | Connected to '+str(len(client.servers))+' servers | Connected to '+str(len(set(client.get_all_members())))+' users')
+    log('Logged in as '+str(client.user.name)+' (ID:'+str(client.user.id)+') | Connected to '+str(len(client.guilds))+' servers | Connected to '+str(len(set(client.get_all_members())))+' users')
     log('')
     log('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__, platform.python_version()))
     log('Ready!')
-    return await client.change_presence(game=discord.Game(name='with dice')) 
+    game = discord.Game("with dice")
+    await client.change_presence(status=discord.Status.online, activity=game)
 
 #Commands
 @client.event
