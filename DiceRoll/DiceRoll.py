@@ -9,7 +9,7 @@ import random
 import time
 
 #Set prefix character
-prefix = "|"
+prefix = "."
 total = 0
 
 
