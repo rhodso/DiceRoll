@@ -79,6 +79,14 @@ async def on_message(message):
             log("Running ping command...")
             await message.channel.send('Pong!')
 
+        #Bin the dice command
+        if (message.content.lower() == (prefix + "binthedice")):
+            log("Binning dice..")
+            s = time.time()  #Get new seed, and apply
+            random.seed(s)
+            log("Binned dice, new seed initialised as " + str(s))
+            await message.channel.send("Binned dice")
+
         #Validate command
         verbose = False
         if (message.content[:9] == (prefix + "validate")):
