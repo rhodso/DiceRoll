@@ -6,6 +6,7 @@ from discord.ext import commands
 import platform
 import datetime
 import random
+import time
 
 #Set prefix character
 prefix = "|"
@@ -41,6 +42,9 @@ async def on_ready():
         discord.__version__, platform.python_version()))
     log('Ready!')
     game = discord.Game("with dice")
+    s = time.time()
+    random.seed(s)
+    log("rng seeded with " + str(s))
     await client.change_presence(status=discord.Status.online, activity=game)
 
 
@@ -62,18 +66,73 @@ async def on_message(message):
             log("Running help command...")
             await message.channel.send(
                 'Usage: **' + prefix +
-                'rtd [SidesOfDice] [Number of dice] [Modifier]**' +
+                'rtd [SidesOfDice] [Modifier] [Number of dice]**' +
                 '\n**[SidesOfDice]** = The number of sides the dice has. Must be more than 1. **If blank then defaults to 20**'
                 +
-                '\n**[NumberOfDice]** = The number of dice to roll. If more than 1, will add all scores together, max 500 dice. **If blank defaults to 1**'
+                '\n**[Modifier]** = The modifier for the dice, applied after total is calculated. **If blank defaults to 0**'
                 +
-                '\n**Modifier]** = The modifier for the dice, applied after total is calculated. **If blank defaults to 0**'
+                '\n**[NumberOfDice]** = The number of dice to roll. If more than 1, will add all scores together, max 500 dice. **If blank defaults to 1**'
             )
 
         #Ping command
         if (message.content == (prefix + "ping")):
             log("Running ping command...")
             await message.channel.send('Pong!')
+
+        #Validate command
+        verbose = False
+        if (message.content[:9] == (prefix + "validate")):
+            SplitMessage = message.content.split(" ")
+            maxValue = 0
+            if (len(SplitMessage) == 1):
+                maxValue = 20
+            elif (len(SplitMessage) == 2):
+                maxValue = int(SplitMessage[1])
+            elif (len(SplitMessage) == 3):
+                maxValue = int(SplitMessage[1])
+                if (SplitMessage[2].lower() == "v"
+                        or SplitMessage[2].lower() == "verbose"):
+                    verbose = True
+
+            log('Starting validation to ' + str(maxValue))
+            await message.channel.send('Starting validation to ' +
+                                       str(maxValue))
+
+            checkList = [False for i in range(maxValue)]
+            t0 = time.time_ns()
+            success = False
+            t = 0
+            for t in range(0, (maxValue * 10000)):
+                #Check to ensure that all numbers have been generated
+                for c in checkList:
+                    success = True
+                    if (c == False):
+                        success = False
+                        break
+                if (success):
+                    break
+                #Success if false, carry on generating numbers
+                roll = random.randint(1, maxValue)
+                if (verbose and checkList[roll - 1] == False):
+                    await message.channel.send(
+                        str(roll) + " was generated at try " + str(t))
+                    log(str(roll) + " was generated at try " + str(t))
+                checkList[roll - 1] = True
+
+            #Either success is true, or we ran out of time
+            if (success):
+                tf = time.time_ns() - t0
+                #Validated
+                log("Validation complete in " + str(tf / 100000000) +
+                    " seconds")
+                await message.channel.send("Validation complete in " +
+                                           str(tf / 100000000) +
+                                           " seconds and " + str(t - 1) +
+                                           " tries")
+            else:
+                #Not validated
+                log("Validation failed")
+                await message.channel.send("Validation failed")
 
         #RollTheDice Command
         if (message.content[:4] == (prefix + "rtd")):
@@ -83,13 +142,13 @@ async def on_message(message):
             SplitMessage = message.content.split(" ")
 
             #   1 = Sides of dice
-            #   2 = Number of dice
-            #   3 = Modifier
+            #   2 = Modifier
+            #   3 = Number of dice
 
             #Setup vars so not out of scope when it runs
             NoOfDice = 1
             SidesOfDice = 20
-            Modifer = 0
+            Modifier = 0
 
             try:
                 runIt = True
@@ -109,7 +168,11 @@ async def on_message(message):
 
                 #Message is command + 2 args
                 if (len(SplitMessage) > 2):
-                    NoOfDice = int(SplitMessage[2])
+                    Modifier = int(SplitMessage[2])
+
+                #Message is command + 3 args
+                if (len(SplitMessage) > 3):
+                    NoOfDice = int(SplitMessage[3])
 
                 #Input validation for number of dice
                 if (NoOfDice < 1):
@@ -124,24 +187,20 @@ async def on_message(message):
                     )
                     runIt = False
 
-                #Message is command + 3 args
-                if (len(SplitMessage) > 3):
-                    Modifer = int(SplitMessage[3])
-
                 if (runIt == True):
                     #Input is valid
-                    log('s = ' + str(SidesOfDice) + ", n = " + str(NoOfDice) +
-                        ", m = " + str(Modifer))
+                    log('s = ' + str(SidesOfDice) + ", m = " + str(Modifier) +
+                        ", n = " + str(NoOfDice))
 
                     #If there's only 1 dice, no need to add up and give total
                     if (NoOfDice == 1):
                         rollRes = random.randint(1, SidesOfDice)
-                        rollMod = rollRes + Modifer
+                        rollMod = rollRes + Modifier
                         log('Res = ' + str(rollMod))
                         await message.channel.send('You rolled a ' +
                                                    str(rollMod) + '! (' +
                                                    str(rollRes) + '+' +
-                                                   str(Modifer) + ')')
+                                                   str(Modifier) + ')')
                     else:
                         total = 0
                         rollStr = ''
@@ -149,14 +208,14 @@ async def on_message(message):
 
                         for i in range(0, NoOfDice):
                             #Roll the dice and tell the user what they rolled
-                            roll = random.randint(1, SidesOfDice - 1)
+                            roll = random.randint(1, SidesOfDice)
                             rollStr = rollStr + str(roll) + ", "
 
                             #Add roll to total
                             total = total + roll
 
                         #Output total
-                        totalMod = total + Modifer
+                        totalMod = total + Modifier
 
                         #remove last 2 chars so that it doesn't look weird
                         rollStr = rollStr[:-2]
@@ -165,7 +224,7 @@ async def on_message(message):
                                                    '\n' + 'Your total is ' +
                                                    str(totalMod) + '! (' +
                                                    str(total) + '+' +
-                                                   str(Modifer) + ')')
+                                                   str(Modifier) + ')')
 
             except Exception as e:
                 #Catch exception
