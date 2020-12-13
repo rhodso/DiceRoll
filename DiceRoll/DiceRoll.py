@@ -22,7 +22,16 @@ def log(Message):
 def getToken():
     tokenFile = open('token.txt', 'r')
     token = tokenFile.read()
+    tokenFile.close()
     return token
+
+
+#Def method to read prefix from file
+def getPrefix():
+    prefixFile = open('prefix.txt', 'r')
+    prefix = prefixFile.read()
+    prefixFile.close()
+    return prefix
 
 
 #Define client
@@ -44,7 +53,7 @@ async def on_ready():
     game = discord.Game("with dice")
     s = time.time()
     random.seed(s)
-    log("rng seeded with " + str(s))
+    log("RNG seeded with " + str(s))
     await client.change_presence(status=discord.Status.online, activity=game)
 
 
