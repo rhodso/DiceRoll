@@ -139,7 +139,7 @@ async def on_message(message):
                         rollMod = rollRes + Modifer
                         log('Res = ' + str(rollMod))
                         await message.channel.send('You rolled a ' +
-                                                   str(rollRes) + '! (' +
+                                                   str(rollMod) + '! (' +
                                                    str(rollRes) + '+' +
                                                    str(Modifer) + ')')
                     else:
