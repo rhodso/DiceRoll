@@ -12,6 +12,19 @@ import time
 prefix = "."
 total = 0
 
+#Def list of reasons to bin the dice
+reasons = [
+    "they were giving shite rolls",
+    "I just _needed_ a new set, yaknow?",
+    "it's what my character would do",
+    "once you lose one you might as well throw the whole fucking set",
+    "they were looking at me funny",
+    "idk but it's totally not because a new set is on sale",
+    "it got a bit chipped when I threw it at a wall for giving me a 1",
+    "this new set is shinier",
+    "[ERROR] - Could not find good reason",
+    "my patron said I should"
+]
 
 #Def log method
 def log(Message):
@@ -94,7 +107,8 @@ async def on_message(message):
             s = time.time()  #Get new seed, and apply
             random.seed(s)
             log("Binned dice, new seed initialised as " + str(s))
-            await message.channel.send("Binned dice")
+
+            await message.channel.send("Binned dice because " + random.choice(reasons))
 
         #Validate command
         verbose = False
