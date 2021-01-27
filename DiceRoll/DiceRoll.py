@@ -7,6 +7,7 @@ import platform
 import datetime
 import random
 import time
+import math
 
 #Set prefix character
 prefix = "."
@@ -14,17 +15,16 @@ total = 0
 
 #Def list of reasons to bin the dice
 reasons = [
-    "they were giving shite rolls",
-    "I just _needed_ a new set, yaknow?",
+    "they were giving shite rolls", "I just _needed_ a new set, yaknow?",
     "it's what my character would do",
     "once you lose one you might as well throw the whole fucking set",
     "they were looking at me funny",
     "idk but it's totally not because a new set is on sale",
     "it got a bit chipped when I threw it at a wall for giving me a 1",
-    "this new set is shinier",
-    "[ERROR] - Could not find good reason",
+    "this new set is shinier", "[ERROR] - Could not find good reason",
     "my patron said I should"
 ]
+
 
 #Def log method
 def log(Message):
@@ -87,19 +87,48 @@ async def on_message(message):
         if (message.content == (prefix + "help")):
             log("Running help command...")
             await message.channel.send(
-                'Usage: **' + prefix +
-                'rtd [SidesOfDice] [Modifier] [Number of dice]**' +
+                '**Roll the dice command** Usage: _' + prefix +
+                'rtd [SidesOfDice] [Modifier] [Number of dice]_' +
                 '\n**[SidesOfDice]** = The number of sides the dice has. Must be more than 1. **If blank then defaults to 20**'
                 +
                 '\n**[Modifier]** = The modifier for the dice, applied after total is calculated. **If blank defaults to 0**'
                 +
                 '\n**[NumberOfDice]** = The number of dice to roll. If more than 1, will add all scores together, max 500 dice. **If blank defaults to 1**'
+                + "\n\n" + "**Do maths command** Usage _" + prefix +
+                "calc [Expression]_\n" +
+                "**[Expression]** = The maths problem to solve. Must use pyhton formatting for it to work (i.e ** for exponents, not ^)"
             )
 
         #Ping command
         if (message.content == (prefix + "ping")):
             log("Running ping command...")
             await message.channel.send('Pong!')
+
+        #calc command
+        if (message.content[:5] == (prefix + "calc")):
+            log("Running calc command")
+
+            #Split message to get expression
+            SplitMessage = message.content.split(" ")
+            expression = ""
+
+            #Assume fail because pessimisim
+            fail = True
+            try:
+                #Try to get the expression, if exception then send error message
+                expression = SplitMessage[1]
+                fail = False
+            except:
+                await message.channel.send(
+                    "No expression specified, please ensure that you type \"" +
+                    prefix + "calc [Expression]\"")
+
+            #If not fail then carry on with the thing
+            if (not fail):
+                log("Expression = " + str(expression))
+                res = str(eval(expression))
+                log("Res = " + res)
+                await message.channel.send(expression + "=" + res)
 
         #Bin the dice command
         if (message.content.lower() == (prefix + "binthedice")):
@@ -108,7 +137,8 @@ async def on_message(message):
             random.seed(s)
             log("Binned dice, new seed initialised as " + str(s))
 
-            await message.channel.send("Binned dice because " + random.choice(reasons))
+            await message.channel.send("Binned dice because " +
+                                       random.choice(reasons))
 
         #Validate command
         verbose = False
