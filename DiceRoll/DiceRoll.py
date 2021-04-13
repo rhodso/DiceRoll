@@ -94,6 +94,11 @@ async def on_message(message):
                 '\n**[Modifier]** = The modifier for the dice, applied after total is calculated. **If blank defaults to 0**'
                 +
                 '\n**[NumberOfDice]** = The number of dice to roll. If more than 1, will add all scores together, max 500 dice. **If blank defaults to 1**'
+                + "\n\n" + "**Advantage and Disadvantage commands** Usage: _" +
+                prefix + 'adv/dis [Modifier] [SidesOfDice]' +
+                '\n**[Modifier]** = The modifier for the dice, applied after total is calculated. **If blank defaults to 0**'
+                +
+                '\n**[SidesOfDice]** = The number of sides the dice has. Must be more than 1. **If blank then defaults to 20**'
                 + "\n\n" + "**Do maths command** Usage _" + prefix +
                 "calc [Expression]_\n" +
                 "**[Expression]** = The maths problem to solve. Must use pyhton formatting for it to work (i.e ** for exponents, not ^)"
@@ -139,6 +144,122 @@ async def on_message(message):
 
             await message.channel.send("Binned dice because " +
                                        random.choice(reasons))
+
+        #Roll with advantage command
+        if (message.content[:4].lower() == (prefix + "adv")):
+            log("Rolling with advantage")
+            SplitMessage = message.content.split(" ")
+
+            Modifier = 0
+            SidesOfDice = 20
+
+            try:
+                runIt = True
+
+                #Python doesn't have switch :(
+
+                #Message is command + 1 arg
+                if (len(SplitMessage) > 1):
+                    Modifier = int(SplitMessage[1])
+
+                #Message is command + 2 args
+                if (len(SplitMessage) > 2):
+                    SidesOfDice = int(SplitMessage[2])
+
+                #Input validation for sides of dice
+                if (SidesOfDice < 2):
+                    log("Sides less than 2, aborting...")
+                    await message.channel.send(
+                        "Sides less than 2, aborting roll")
+                    runIt = False
+
+            except Exception as e:
+                #Catch exception
+                log('Exception occured, ' + str(e))
+                #Tell the user to check their parameters
+                await message.channel.send(
+                    'Something went wrong, did you type the parameters correctly?'
+                )
+
+            if (runIt == True):
+                log("m = " + str(Modifier) + 's = ' + str(SidesOfDice))
+
+                rollRes1 = random.randint(1, SidesOfDice)
+                rollRes2 = random.randint(1, SidesOfDice)
+
+                await message.channel.send(
+                    "Rolling with advantage: \n1st roll is  " + str(rollRes1) +
+                    "\n2nd roll is " + str(rollRes2))
+
+                lowroll = 0
+                if (rollRes1 > rollRes2):
+                    lowroll = rollRes1
+                else:
+                    lowroll = rollRes2
+
+                lowRollMod = lowroll + Modifier
+                await message.channel.send("Highest roll is " +
+                                           str(lowRollMod) + " (" +
+                                           str(lowroll) + "+" + str(Modifier) +
+                                           ")")
+
+        #Roll with disadvantage command
+        if (message.content[:4].lower() == (prefix + "dis")):
+            log("Rolling with disadvantage")
+            SplitMessage = message.content.split(" ")
+
+            Modifier = 0
+            SidesOfDice = 20
+
+            try:
+                runIt = True
+
+                #Python doesn't have switch :(
+
+                #Message is command + 1 arg
+                if (len(SplitMessage) > 1):
+                    Modifier = int(SplitMessage[1])
+
+                #Message is command + 2 args
+                if (len(SplitMessage) > 2):
+                    SidesOfDice = int(SplitMessage[2])
+
+                #Input validation for sides of dice
+                if (SidesOfDice < 2):
+                    log("Sides less than 2, aborting...")
+                    await message.channel.send(
+                        "Sides less than 2, aborting roll")
+                    runIt = False
+
+            except Exception as e:
+                #Catch exception
+                log('Exception occured, ' + str(e))
+                #Tell the user to check their parameters
+                await message.channel.send(
+                    'Something went wrong, did you type the parameters correctly?'
+                )
+
+            if (runIt == True):
+                log("m = " + str(Modifier) + 's = ' + str(SidesOfDice))
+
+                rollRes1 = random.randint(1, SidesOfDice)
+                rollRes2 = random.randint(1, SidesOfDice)
+
+                await message.channel.send(
+                    "Rolling with disadvantage: \n1st roll is  " +
+                    str(rollRes1) + "\n2nd roll is " + str(rollRes2))
+
+                lowroll = 0
+                if (rollRes1 < rollRes2):
+                    lowroll = rollRes1
+                else:
+                    lowroll = rollRes2
+
+                lowRollMod = lowroll + Modifier
+                await message.channel.send("Lowest roll is " +
+                                           str(lowRollMod) + " (" +
+                                           str(lowroll) + "+" + str(Modifier) +
+                                           ")")
 
         #Validate command
         verbose = False
