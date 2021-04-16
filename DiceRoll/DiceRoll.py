@@ -432,7 +432,6 @@ async def on_message(message):
                                            str(lowroll) + "+" + str(Modifier) +
                                            ")")
 
-
         #RollTheDice Command
         if (message.content[:4] == (prefix + "rtd")):
             log("Running DiceRoll command...")
