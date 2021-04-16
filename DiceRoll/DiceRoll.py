@@ -195,6 +195,123 @@ async def on_message(message):
                 log("Validation failed")
                 await message.channel.send("Validation failed")
 
+        #Roll with advantage command
+        if (message.content[:4].lower() == (prefix + "adv")):
+            log("Rolling with advantage")
+            SplitMessage = message.content.split(" ")
+
+            Modifier = 0
+            SidesOfDice = 20
+
+            try:
+                runIt = True
+
+                #Python doesn't have switch :(
+
+                #Message is command + 1 arg
+                if (len(SplitMessage) > 1):
+                    Modifier = int(SplitMessage[1])
+
+                #Message is command + 2 args
+                if (len(SplitMessage) > 2):
+                    SidesOfDice = int(SplitMessage[2])
+
+                #Input validation for sides of dice
+                if (SidesOfDice < 2):
+                    log("Sides less than 2, aborting...")
+                    await message.channel.send(
+                        "Sides less than 2, aborting roll")
+                    runIt = False
+
+            except Exception as e:
+                #Catch exception
+                log('Exception occured, ' + str(e))
+                #Tell the user to check their parameters
+                await message.channel.send(
+                    'Something went wrong, did you type the parameters correctly?'
+                )
+
+            if (runIt == True):
+                log("m = " + str(Modifier) + 's = ' + str(SidesOfDice))
+
+                rollRes1 = random.randint(1, SidesOfDice)
+                rollRes2 = random.randint(1, SidesOfDice)
+
+                await message.channel.send(
+                    "Rolling with advantage: \n1st roll is  " + str(rollRes1) +
+                    "\n2nd roll is " + str(rollRes2))
+
+                lowroll = 0
+                if (rollRes1 > rollRes2):
+                    lowroll = rollRes1
+                else:
+                    lowroll = rollRes2
+
+                lowRollMod = lowroll + Modifier
+                await message.channel.send("Highest roll is " +
+                                           str(lowRollMod) + " (" +
+                                           str(lowroll) + "+" + str(Modifier) +
+                                           ")")
+
+        #Roll with disadvantage command
+        if (message.content[:4].lower() == (prefix + "dis")):
+            log("Rolling with disadvantage")
+            SplitMessage = message.content.split(" ")
+
+            Modifier = 0
+            SidesOfDice = 20
+
+            try:
+                runIt = True
+
+                #Python doesn't have switch :(
+
+                #Message is command + 1 arg
+                if (len(SplitMessage) > 1):
+                    Modifier = int(SplitMessage[1])
+
+                #Message is command + 2 args
+                if (len(SplitMessage) > 2):
+                    SidesOfDice = int(SplitMessage[2])
+
+                #Input validation for sides of dice
+                if (SidesOfDice < 2):
+                    log("Sides less than 2, aborting...")
+                    await message.channel.send(
+                        "Sides less than 2, aborting roll")
+                    runIt = False
+
+            except Exception as e:
+                #Catch exception
+                log('Exception occured, ' + str(e))
+                #Tell the user to check their parameters
+                await message.channel.send(
+                    'Something went wrong, did you type the parameters correctly?'
+                )
+
+            if (runIt == True):
+                log("m = " + str(Modifier) + 's = ' + str(SidesOfDice))
+
+                rollRes1 = random.randint(1, SidesOfDice)
+                rollRes2 = random.randint(1, SidesOfDice)
+
+                await message.channel.send(
+                    "Rolling with disadvantage: \n1st roll is  " +
+                    str(rollRes1) + "\n2nd roll is " + str(rollRes2))
+
+                lowroll = 0
+                if (rollRes1 < rollRes2):
+                    lowroll = rollRes1
+                else:
+                    lowroll = rollRes2
+
+                lowRollMod = lowroll + Modifier
+                await message.channel.send("Lowest roll is " +
+                                           str(lowRollMod) + " (" +
+                                           str(lowroll) + "+" + str(Modifier) +
+                                           ")")
+
+
         #RollTheDice Command
         if (message.content[:4] == (prefix + "rtd")):
             log("Running DiceRoll command...")
