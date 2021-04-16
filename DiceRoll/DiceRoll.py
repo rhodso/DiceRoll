@@ -376,13 +376,29 @@ async def on_message(message):
 
                     #If there's only 1 dice, no need to add up and give total
                     if (NoOfDice == 1):
+                        #Do roll
                         rollRes = random.randint(1, SidesOfDice)
                         rollMod = rollRes + Modifier
                         log('Res = ' + str(rollMod))
-                        await message.channel.send('You rolled a ' +
-                                                   str(rollMod) + '! (' +
-                                                   str(rollRes) + '+' +
-                                                   str(Modifier) + ')')
+                        if (SidesOfDice == 20
+                                and (rollRes == 1 or rollRes == 20)):
+                            #Special conditions for 20 sided dice
+                            msg = ""
+                            #Add corresponding string for nat 20 or nat 1
+                            if (rollRes == 20):
+                                msg += 'You rolled a nat 20!'
+                            elif (rollRes == 1):
+                                msg += 'You rolled a nat 1 :('
+                            #Output message but include rollmod in case this wasn't wanted by user
+                            await message.channel.send(msg +
+                                                       "\n(With mod res is " +
+                                                       str(rollMod) + ")")
+                        #Do roll as normal
+                        else:
+                            await message.channel.send('You rolled a ' +
+                                                       str(rollMod) + '! (' +
+                                                       str(rollRes) + '+' +
+                                                       str(Modifier) + ')')
                     else:
                         total = 0
                         rollStr = ''
