@@ -280,6 +280,8 @@ async def on_message(message):
             await message.channel.send('Starting validation to ' +
                                        str(maxValue))
 
+            messageStr = ""
+
             checkList = [False for i in range(maxValue)]
             t0 = time.time_ns()
             success = False
@@ -296,8 +298,7 @@ async def on_message(message):
                 #Success if false, carry on generating numbers
                 roll = random.randint(1, maxValue)
                 if (verbose and checkList[roll - 1] == False):
-                    await message.channel.send(
-                        str(roll) + " was generated at try " + str(t))
+                    messageStr += str(roll) + " was generated at try " + str(t) + "\n"
                     log(str(roll) + " was generated at try " + str(t))
                 checkList[roll - 1] = True
 
@@ -307,10 +308,8 @@ async def on_message(message):
                 #Validated
                 log("Validation complete in " + str(tf / 100000000) +
                     " seconds")
-                await message.channel.send("Validation complete in " +
-                                           str(tf / 100000000) +
-                                           " seconds and " + str(t - 1) +
-                                           " tries")
+                messageStr += "Validation complete in " + str(tf / 100000000) + " seconds and " + str(t - 1) + " tries"
+                await message.channel.send(messageStr)
             else:
                 #Not validated
                 log("Validation failed")
