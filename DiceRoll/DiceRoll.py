@@ -145,122 +145,6 @@ async def on_message(message):
             await message.channel.send("Binned dice because " +
                                        random.choice(reasons))
 
-        #Roll with advantage command
-        if (message.content[:4].lower() == (prefix + "adv")):
-            log("Rolling with advantage")
-            SplitMessage = message.content.split(" ")
-
-            Modifier = 0
-            SidesOfDice = 20
-
-            try:
-                runIt = True
-
-                #Python doesn't have switch :(
-
-                #Message is command + 1 arg
-                if (len(SplitMessage) > 1):
-                    Modifier = int(SplitMessage[1])
-
-                #Message is command + 2 args
-                if (len(SplitMessage) > 2):
-                    SidesOfDice = int(SplitMessage[2])
-
-                #Input validation for sides of dice
-                if (SidesOfDice < 2):
-                    log("Sides less than 2, aborting...")
-                    await message.channel.send(
-                        "Sides less than 2, aborting roll")
-                    runIt = False
-
-            except Exception as e:
-                #Catch exception
-                log('Exception occured, ' + str(e))
-                #Tell the user to check their parameters
-                await message.channel.send(
-                    'Something went wrong, did you type the parameters correctly?'
-                )
-
-            if (runIt == True):
-                log("m = " + str(Modifier) + 's = ' + str(SidesOfDice))
-
-                rollRes1 = random.randint(1, SidesOfDice)
-                rollRes2 = random.randint(1, SidesOfDice)
-
-                await message.channel.send(
-                    "Rolling with advantage: \n1st roll is  " + str(rollRes1) +
-                    "\n2nd roll is " + str(rollRes2))
-
-                lowroll = 0
-                if (rollRes1 > rollRes2):
-                    lowroll = rollRes1
-                else:
-                    lowroll = rollRes2
-
-                lowRollMod = lowroll + Modifier
-                await message.channel.send("Highest roll is " +
-                                           str(lowRollMod) + " (" +
-                                           str(lowroll) + "+" + str(Modifier) +
-                                           ")")
-
-        #Roll with disadvantage command
-        if (message.content[:4].lower() == (prefix + "dis")):
-            log("Rolling with disadvantage")
-            SplitMessage = message.content.split(" ")
-
-            Modifier = 0
-            SidesOfDice = 20
-
-            try:
-                runIt = True
-
-                #Python doesn't have switch :(
-
-                #Message is command + 1 arg
-                if (len(SplitMessage) > 1):
-                    Modifier = int(SplitMessage[1])
-
-                #Message is command + 2 args
-                if (len(SplitMessage) > 2):
-                    SidesOfDice = int(SplitMessage[2])
-
-                #Input validation for sides of dice
-                if (SidesOfDice < 2):
-                    log("Sides less than 2, aborting...")
-                    await message.channel.send(
-                        "Sides less than 2, aborting roll")
-                    runIt = False
-
-            except Exception as e:
-                #Catch exception
-                log('Exception occured, ' + str(e))
-                #Tell the user to check their parameters
-                await message.channel.send(
-                    'Something went wrong, did you type the parameters correctly?'
-                )
-
-            if (runIt == True):
-                log("m = " + str(Modifier) + 's = ' + str(SidesOfDice))
-
-                rollRes1 = random.randint(1, SidesOfDice)
-                rollRes2 = random.randint(1, SidesOfDice)
-
-                await message.channel.send(
-                    "Rolling with disadvantage: \n1st roll is  " +
-                    str(rollRes1) + "\n2nd roll is " + str(rollRes2))
-
-                lowroll = 0
-                if (rollRes1 < rollRes2):
-                    lowroll = rollRes1
-                else:
-                    lowroll = rollRes2
-
-                lowRollMod = lowroll + Modifier
-                await message.channel.send("Lowest roll is " +
-                                           str(lowRollMod) + " (" +
-                                           str(lowroll) + "+" + str(Modifier) +
-                                           ")")
-
         #Validate command
         verbose = False
         if (message.content[:9] == (prefix + "validate")):
@@ -298,7 +182,8 @@ async def on_message(message):
                 #Success if false, carry on generating numbers
                 roll = random.randint(1, maxValue)
                 if (verbose and checkList[roll - 1] == False):
-                    messageStr += str(roll) + " was generated at try " + str(t) + "\n"
+                    messageStr += str(roll) + " was generated at try " + str(
+                        t) + "\n"
                     log(str(roll) + " was generated at try " + str(t))
                 checkList[roll - 1] = True
 
@@ -308,7 +193,8 @@ async def on_message(message):
                 #Validated
                 log("Validation complete in " + str(tf / 100000000) +
                     " seconds")
-                messageStr += "Validation complete in " + str(tf / 100000000) + " seconds and " + str(t - 1) + " tries"
+                messageStr += "Validation complete in " + str(
+                    tf / 100000000) + " seconds and " + str(t - 1) + " tries"
                 await message.channel.send(messageStr)
             else:
                 #Not validated
