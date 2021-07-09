@@ -243,10 +243,6 @@ async def on_message(message):
                 rollRes1 = random.randint(1, SidesOfDice)
                 rollRes2 = random.randint(1, SidesOfDice)
 
-                await message.channel.send(
-                    "Rolling with advantage: \n1st roll is  " + str(rollRes1) +
-                    "\n2nd roll is " + str(rollRes2))
-
                 lowroll = 0
                 if (rollRes1 > rollRes2):
                     lowroll = rollRes1
@@ -254,7 +250,12 @@ async def on_message(message):
                     lowroll = rollRes2
 
                 lowRollMod = lowroll + Modifier
-                await message.channel.send("Highest roll is " +
+                await message.channel.send("Rolling with advantage: \n1st d" +
+                                           str(SidesOfDice) + " roll is " +
+                                           str(rollRes1) + "\n2nd d" +
+                                           str(SidesOfDice) + " roll is " +
+                                           str(rollRes2) +
+                                           "\nHighest roll is " +
                                            str(lowRollMod) + " (" +
                                            str(lowroll) + "+" + str(Modifier) +
                                            ")")
@@ -301,10 +302,6 @@ async def on_message(message):
                 rollRes1 = random.randint(1, SidesOfDice)
                 rollRes2 = random.randint(1, SidesOfDice)
 
-                await message.channel.send(
-                    "Rolling with disadvantage: \n1st roll is  " +
-                    str(rollRes1) + "\n2nd roll is " + str(rollRes2))
-
                 lowroll = 0
                 if (rollRes1 < rollRes2):
                     lowroll = rollRes1
@@ -312,10 +309,12 @@ async def on_message(message):
                     lowroll = rollRes2
 
                 lowRollMod = lowroll + Modifier
-                await message.channel.send("Lowest roll is " +
-                                           str(lowRollMod) + " (" +
-                                           str(lowroll) + "+" + str(Modifier) +
-                                           ")")
+                await message.channel.send(
+                    "Rolling with disadvantage: \n1st d" + str(SidesOfDice) +
+                    " roll is " + str(rollRes1) + "\n2nd d" +
+                    str(SidesOfDice) + " roll is " + str(rollRes2) +
+                    "\nLowest roll is " + str(lowRollMod) + " (" +
+                    str(lowroll) + "+" + str(Modifier) + ")")
 
         #RollTheDice Command
         if (message.content[:4] == (prefix + "rtd")):
@@ -396,7 +395,9 @@ async def on_message(message):
                                                        str(rollMod) + ")")
                         #Do roll as normal
                         else:
-                            await message.channel.send('You rolled a ' +
+                            await message.channel.send('Your d' +
+                                                       str(SidesOfDice) +
+                                                       ' rolled a ' +
                                                        str(rollMod) + '! (' +
                                                        str(rollRes) + '+' +
                                                        str(Modifier) + ')')
