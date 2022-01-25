@@ -198,7 +198,7 @@ async def on_message(message):
                     lowroll = rollRes2
 
                 lowRollMod = lowroll + Modifier
-                await message.channel.send("Highest roll is " +
+                await message.channel.send("\nHighest roll is " +
                                            str(lowRollMod) + " (" +
                                            str(lowroll) + "+" + str(Modifier) +
                                            ")")
@@ -379,6 +379,7 @@ async def on_message(message):
 
                     #If there's only 1 dice, no need to add up and give total
                     if (NoOfDice == 1):
+                        #Do roll
                         rollRes = random.randint(1, SidesOfDice)
                         rollMod = rollRes + Modifier
                         log('Res = ' + str(rollMod))
