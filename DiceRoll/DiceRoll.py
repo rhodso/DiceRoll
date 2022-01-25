@@ -145,62 +145,6 @@ async def on_message(message):
             await message.channel.send("Binned dice because " +
                                        random.choice(reasons))
 
-        #Validate command
-        verbose = False
-        if (message.content[:9] == (prefix + "validate")):
-            SplitMessage = message.content.split(" ")
-            maxValue = 0
-            if (len(SplitMessage) == 1):
-                maxValue = 20
-            elif (len(SplitMessage) == 2):
-                maxValue = int(SplitMessage[1])
-            elif (len(SplitMessage) == 3):
-                maxValue = int(SplitMessage[1])
-                if (SplitMessage[2].lower() == "v"
-                        or SplitMessage[2].lower() == "verbose"):
-                    verbose = True
-
-            log('Starting validation to ' + str(maxValue))
-            await message.channel.send('Starting validation to ' +
-                                       str(maxValue))
-
-            messageStr = ""
-
-            checkList = [False for i in range(maxValue)]
-            t0 = time.time_ns()
-            success = False
-            t = 0
-            for t in range(0, (maxValue * 10000)):
-                #Check to ensure that all numbers have been generated
-                for c in checkList:
-                    success = True
-                    if (c == False):
-                        success = False
-                        break
-                if (success):
-                    break
-                #Success if false, carry on generating numbers
-                roll = random.randint(1, maxValue)
-                if (verbose and checkList[roll - 1] == False):
-                    messageStr += str(roll) + " was generated at try " + str(
-                        t) + "\n"
-                    log(str(roll) + " was generated at try " + str(t))
-                checkList[roll - 1] = True
-
-            #Either success is true, or we ran out of time
-            if (success):
-                tf = time.time_ns() - t0
-                #Validated
-                log("Validation complete in " + str(tf / 100000000) +
-                    " seconds")
-                messageStr += "Validation complete in " + str(
-                    tf / 100000000) + " seconds and " + str(t - 1) + " tries"
-                await message.channel.send(messageStr)
-            else:
-                #Not validated
-                log("Validation failed")
-                await message.channel.send("Validation failed")
-
         #Roll with advantage command
         if (message.content[:4].lower() == (prefix + "adv")):
             log("Rolling with advantage")
