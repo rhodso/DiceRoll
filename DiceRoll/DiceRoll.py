@@ -188,8 +188,8 @@ async def on_message(message):
                 rollRes2 = random.randint(1, SidesOfDice)
 
                 await message.channel.send(
-                    "Rolling with advantage: \n1st roll is  " + str(rollRes1) +
-                    "\n2nd roll is " + str(rollRes2))
+                    "Rolling with advantage: \n1st roll is  " + str(rollRes1) + "(+ " + str(Modifier) + " = " + str(rollRes1+Modifier) + ")" +
+                    "\n2nd roll is " + str(rollRes2) + "(+ " + str(Modifier) + " = " + str(rollRes2+Modifier) + ")" )
 
                 lowroll = 0
                 if (rollRes1 > rollRes2):
@@ -246,8 +246,8 @@ async def on_message(message):
                 rollRes2 = random.randint(1, SidesOfDice)
 
                 await message.channel.send(
-                    "Rolling with disadvantage: \n1st roll is  " +
-                    str(rollRes1) + "\n2nd roll is " + str(rollRes2))
+                    "Rolling with disadvantage: \n1st roll is  " + str(rollRes1) + "(+ " + str(Modifier) + " = " + str(rollRes1+Modifier) + ")" +
+                    "\n2nd roll is " + str(rollRes2) + "(+ " + str(Modifier) + " = " + str(rollRes2+Modifier) + ")")
 
                 lowroll = 0
                 if (rollRes1 < rollRes2):
@@ -284,6 +284,7 @@ async def on_message(message):
             t0 = time.time_ns()
             success = False
             t = 0
+            out = ""
             for t in range(0, (maxValue * 10000)):
                 #Check to ensure that all numbers have been generated
                 for c in checkList:
@@ -296,10 +297,12 @@ async def on_message(message):
                 #Success if false, carry on generating numbers
                 roll = random.randint(1, maxValue)
                 if (verbose and checkList[roll - 1] == False):
-                    await message.channel.send(
-                        str(roll) + " was generated at try " + str(t))
+                    out += str(roll) + " was generated at try " + str(t) + "\n"
                     log(str(roll) + " was generated at try " + str(t))
                 checkList[roll - 1] = True
+
+            if(verbose):
+                await(message.channel.send(out))
 
             #Either success is true, or we ran out of time
             if (success):
@@ -379,10 +382,19 @@ async def on_message(message):
                         rollRes = random.randint(1, SidesOfDice)
                         rollMod = rollRes + Modifier
                         log('Res = ' + str(rollMod))
-                        await message.channel.send('You rolled a ' +
-                                                   str(rollMod) + '! (' +
-                                                   str(rollRes) + '+' +
-                                                   str(Modifier) + ')')
+
+                        if(SidesOfDice == 20 and rollRes == 1):
+                            await message.channel.send("You rolled a nat 1 :(\n(With mod roll is a " + str(rollMod) + ")")
+
+                        elif(SidesOfDice == 20 and rollRes == 20):    
+                            await message.channel.send("You rolled a nat 20!\n(With mod roll is a " + str(rollMod) + ")")
+
+                        else:
+                            await message.channel.send('You rolled a ' +
+                                                str(rollMod) + '! (' +
+                                                str(rollRes) + '+' +
+                                                str(Modifier) + ')')
+
                     else:
                         total = 0
                         rollStr = ''
