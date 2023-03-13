@@ -1,28 +1,27 @@
-#Imports
-import asyncio
-import platform
+# Import standard packages that we know we have access to
 import datetime
-import random
 import time
-import math
 import os
+import sys
+import subprocess
+import logging
+import random
+import typing
 
-# Discord imports
-import discord
-from discord import Option
-from discord.ext import commands
+# Global variables
+BOT_TOKEN = ""
+INIT_TIME = time.time()
+LOG_TO_FILE = False
+LOG_FILE_NAME = "bot.log"
+TEST_GUILD_ID = 302584459579097118
 
+# This is lazy
 def log(Message):
-    print(str(datetime.datetime.now()) + '   ' + str(Message))
+    logging.info(msg=Message)
 
-def getToken():
-    tokenFile = open('token.txt', 'r')
-    token = tokenFile.read()
-    tokenFile.close()
-    return token
-
-def help_cmd():
-    return '**Roll the dice command** Usage: _' + "/" + 'rtd [SidesOfDice] [Modifier] [Number of dice]_' + '\n**[SidesOfDice]** = The number of sides the dice has. Must be more than 1. **If blank then defaults to 20**'+ '\n**[Modifier]** = The modifier for the dice, applied after total is calculated. **If blank defaults to 0**'+ '\n**[NumberOfDice]** = The number of dice to roll. If more than 1, will add all scores together, max 500 dice. **If blank defaults to 1**'+ "\n\n" + "**Advantage and Disadvantage commands** Usage: _" + "/" + 'adv or dis [Modifier] [SidesOfDice]' + '\n**[Modifier]** = The modifier for the dice, applied after total is calculated. **If blank defaults to 0**'+ '\n**[SidesOfDice]** = The number of sides the dice has. Must be more than 1. **If blank then defaults to 20**'+ "\n\n" + "**Do maths command** Usage _" + "/" + "calc [Expression]_\n" + "**[Expression]** = The maths problem to solve. Must use pyhton formatting for it to work (i.e ** for exponents, not ^)"
+# Delete the log file if it exists
+if os.path.isfile(path=LOG_FILE_NAME):
+    os.remove(path=LOG_FILE_NAME)
 
 def ping_cmd():
     return "Pong!"
@@ -108,7 +107,7 @@ def calc_cmd(expression):
     log("Expression = " + expression)
     res = str(eval(expression))
     log("Result = " + res)
-    return res
+    return expression + " = " + res
 
 def adv_cmd(modifier, sides):
     #Input validation for sides of dice
@@ -235,91 +234,132 @@ def validate_cmd(maxVal, verbose):
 
     return out
 
-intents = discord.Intents.default()
-bot = discord.Bot()
+# Set up logging
+if LOG_TO_FILE:
+    log_handler = logging.basicConfig(format='%(asctime)s %(message)s', filename=LOG_FILE_NAME, encoding='utf-8', level=logging.INFO)
+else:
+    log_handler = logging.basicConfig(format='%(asctime)s %(message)s', encoding='utf-8', level=logging.INFO)
 
-def on_startup():
-    s = time.time()
-    random.seed(s)
-
-    log('Starting up...')
-    log('Python version: ' + platform.python_version())
-    log('pycord version: ' + discord.__version__)
-    log("RNG seeded with " + str(s))
-
-def on_shutdown():
-    log('Shutting down...')
-
-@bot.event
-async def on_ready():
-    await bot.change_presence(activity=discord.Game(name="with dice"))
-    log('Bot ready')
-    log('Logged in as ' + bot.user.name + ' (' + str(bot.user.id) + ')')
-
-# Help command
-@bot.slash_command(description="Lists commands")
-async def help(ctx):
-    log('Running help command')
-    await ctx.respond(help_cmd())
-        
-# Ping command
-@bot.slash_command(description="Ping the bot to see if it's alive")
-async def ping(ctx):
-    log("Running ping command")
-    await ctx.respond(ping_cmd())
-
-# Roll the dice command
-@bot.slash_command(description="Roll a dice with specified sides and modifier, as well as a number of dice")
-async def rtd(ctx, 
-        sides: Option(discord.SlashCommandOptionType.integer, description="Number of sides on the dice", required=True, default=20, min_value=2, max_value=999, name="sides", type=4), 
-        modifier: Option(discord.SlashCommandOptionType.integer, description="Modifier to add to the dice roll", required=True, default=0, min_value=-999, max_value=999, name="modifier", type=4),
-        number: Option(discord.SlashCommandOptionType.integer, description="The Number of dice to roll", required=True, default=1, min_value=1, max_value=999, name="number", type=4)
-    ):
-    log("Running rtd command")
-    await ctx.respond(rtd_cmd(sides, modifier, number))
-
-# Calculator command
-@bot.slash_command(description="Perform mathematical operations because maths is hard")
-async def calc(ctx, 
-        expression: Option(discord.SlashCommandOptionType.string, description="The expression to evaluate", required=True, name="expression", type=3)
-    ):
-    log("Running calc command")
-    await ctx.respond(calc_cmd(expression))
-
-# Roll with advantage command
-@bot.slash_command(description="Rolls a dice with advantage")
-async def adv(ctx, 
-        sides: Option(discord.SlashCommandOptionType.integer, description="Number of sides on the dice", required=True, default=20, min_value=2, max_value=999, name="sides", type=4), 
-        modifier: Option(discord.SlashCommandOptionType.integer, description="Modifier to add to the dice roll", required=True, default=0, min_value=-999, max_value=999, name="modifier", type=4),
-    ):
-    log("Running adv command")
-    await ctx.respond(adv_cmd(modifier, sides))
+# Try to import libraries
+try:
+    logging.info(msg="Importing libraries...")
+    # TODO: Add other needed libraries here
+    import discord
+    from discord import app_commands
+    from discord.ext import commands
     
-# Roll with disadvantage command
-@bot.slash_command(description="Rolls a dice with disadvantage")
-async def dis(ctx,         
-        sides: Option(discord.SlashCommandOptionType.integer, description="Number of sides on the dice", required=True, default=20, min_value=2, max_value=999, name="sides", type=4), 
-        modifier: Option(discord.SlashCommandOptionType.integer, description="Modifier to add to the dice roll", required=True, default=0, min_value=-999, max_value=999, name="modifier", type=4),
-    ):
-    log("Running dis command")
-    await ctx.respond(dis_cmd(modifier, sides))
+except ImportError:
+    # Install requirements from requirements.txt, restart the script and exit
+    logging.error(msg="Failed to import libraries, installing requirements...")
+    subprocess.call(['python', '-m', 'pip', 'install', '-r', 'requirements.txt'])
 
-# Bin the dice command
-@bot.slash_command(description="Bins the dice (resets the RNG) and tells you why")
-async def bin_the_dice(ctx):
-    log("Running binTheDice command")
-    await ctx.respond(binTheDice_cmd())
+    # Restart the script
+    logging.info(msg="Restarting script...")
+    subprocess.call(['python', 'main.py'])
+    exit()
 
-# Validate command
-@bot.slash_command(description="Validates the RNG by checking that all numbers are generated")
-async def validate(ctx, 
-        max_val: Option(discord.SlashCommandOptionType.integer, description="The maximum value to validate to", required=True, default=20, min_value=2, max_value=999, name="max_val", type=4),
-        verbose: Option(discord.SlashCommandOptionType.boolean, description="Whether to output the numbers generated", required=True, default=False, name="verbose", type=5)
-    ):
-    log("Running validate command")
-    await ctx.respond(validate_cmd(max_val, verbose))
+# Bot class
+class Bot(commands.Bot):
+    def __init__(self, prefix, intents):    
+        logging.info(msg="Initializing bot...")
+        super().__init__(command_prefix=prefix,intents=intents)
+        
+    async def setup_hook(self):
+        logging.info(msg="Syncing commands...")
+        self.tree.copy_global_to(guild=TEST_GUILD_ID)
+        await self.tree.sync(guild=TEST_GUILD_ID)
 
-# Starting the bot
-on_startup()
-bot.run(getToken())
-on_shutdown()
+    async def on_ready(self):
+        # Log that the bot is ready
+        logging.info(msg="Bot ready, logged in as " + self.user.name + "#" + self.user.discriminator)
+
+
+# Create some variables here that will get populated later
+intents = None
+client = None
+
+# Re-create the TEST_GUILD_ID variable to be a discord.Guild object
+TEST_GUILD_ID = discord.Object(id=TEST_GUILD_ID)
+
+# *****************
+# Startup sequence
+# *****************
+
+# Log version information
+logging.info(msg="Startup")
+logging.info(msg="Python version: " + sys.version)
+logging.info(msg="Discord.py version: " + discord.__version__)
+
+# Get the bot token from the file
+# First, check if the file exists and if it doesn't, create it and show an error message, then exit
+
+if not os.path.isfile('token.txt'):
+    logging.warning(msg="Token file not found, creating file...")
+    with open('token.txt', 'w') as f:
+        f.write("")
+    logging.error(msg="Token file created, please add your bot token to the file and restart the bot")
+    exit()
+
+# If the file exists, open it and read the token
+with open('token.txt', 'r') as f:
+    BOT_TOKEN = f.read()
+# Ensure that the token is not empty
+if BOT_TOKEN == "":
+    logging.error(msg="Token file is empty, please add your bot token to the file and restart the bot")
+    exit()
+
+# If we get to this point, the token is a thing that exists
+logging.info(msg="Token found")
+
+# Set the intents
+logging.info(msg="Setting intents...")
+intents = discord.Intents.default()
+intents.message_content = True
+
+# Create the bot
+logging.info(msg="Creating bot...")
+client = Bot(prefix="!", intents=intents)
+
+@client.tree.command(name="ping")
+async def ping(interaction):
+    await interaction.response.defer()
+    await interaction.followup.send(content="Pong!")
+
+@client.tree.command(name="rtd")
+async def rtd(interaction, sides:typing.Optional[int] = 20, modifier:typing.Optional[int] = 0, number:typing.Optional[int] = 1):
+    await interaction.response.defer()
+    await interaction.followup.send(content=rtd_cmd(sides, modifier, number))
+
+@client.tree.command(name="adv")
+async def adv(interaction, modifier:typing.Optional[int] = 0, sides:typing.Optional[int] = 20):
+    await interaction.response.defer()
+    await interaction.followup.send(content=adv_cmd(sides, modifier))
+
+@client.tree.command(name="dis")
+async def dis(interaction, modifier:typing.Optional[int] = 0, sides:typing.Optional[int] = 20):
+    await interaction.response.defer()
+    await interaction.followup.send(content=dis_cmd(sides, modifier))
+
+@client.tree.command(name="bin_the_dice")
+async def bin(interaction):
+    await interaction.response.defer()
+    await interaction.followup.send(content=binTheDice_cmd())
+
+@client.tree.command(name="validate")
+async def validate(interaction, max_val:typing.Optional[int] = 20, verbose:typing.Optional[bool] = False):
+    await interaction.response.defer()
+    await interaction.followup.send(content=validate_cmd(max_val, verbose))
+
+@client.tree.command(name="help")
+async def help(interaction):
+    await interaction.response.defer()
+    await interaction.followup.send(content=help_cmd())
+
+@client.tree.command(name="calc")
+async def calc(interaction, expression:str):
+    await interaction.response.defer()
+    await interaction.followup.send(content=calc_cmd(expression))
+
+# Run the bot
+logging.info(msg="Running bot...")
+client.run(BOT_TOKEN, log_handler=log_handler)
