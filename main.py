@@ -10,21 +10,40 @@ import typing
 
 # Global variables
 BOT_TOKEN = ""
-INIT_TIME = time.time()
 LOG_TO_FILE = False
 LOG_FILE_NAME = "bot.log"
 TEST_GUILD_ID = 302584459579097118
-
-# This is lazy
-def log(Message):
-    logging.info(msg=Message)
 
 # Delete the log file if it exists
 if os.path.isfile(path=LOG_FILE_NAME):
     os.remove(path=LOG_FILE_NAME)
 
-def ping_cmd():
-    return "Pong!"
+# Set up logging
+if LOG_TO_FILE:
+    log_handler = logging.basicConfig(format='%(asctime)s %(message)s', filename=LOG_FILE_NAME, encoding='utf-8', level=logging.INFO)
+else:
+    log_handler = logging.basicConfig(format='%(asctime)s %(message)s', encoding='utf-8', level=logging.INFO)
+
+# Try to import libraries
+try:
+    logging.info(msg="Importing libraries...")
+    # TODO: Add other needed libraries here
+    import discord
+    from discord import app_commands
+    from discord.ext import commands
+    
+except ImportError:
+    # Log which libraries failed to import
+    logging.error(msg="Failed to import libraries: " + str(sys.exc_info()[1]))
+
+    # Install requirements from requirements.txt, restart the script and exit
+    logging.error(msg="Failed to import libraries, installing requirements...")
+    subprocess.call(['python', '-m', 'pip', 'install', '-r', 'requirements.txt'])
+
+    # Restart the script
+    logging.info(msg="Restarting script...")
+    subprocess.call(['python', 'main.py'])
+    exit()
 
 def rtd_cmd(sides, modifier, number):
     NoOfDice = number
@@ -34,27 +53,28 @@ def rtd_cmd(sides, modifier, number):
     try:
         runIt = True
 
-        #Python doesn't have switch :(
+        # Python doesn't have switch :(
+        # Python does now, but I'm too lazy to change it
 
         #Input validation for sides of dice
         if (SidesOfDice < 2):
-            log("Sides less than 2, aborting...")
+            logging.error(msg="Sides less than 2, aborting...")
             return "Sides less than 2, aborting roll"
             runIt = False
 
         #Input validation for number of dice
         if (NoOfDice < 1):
-            log("Dice count less than 1, aborting...")
+            logging.error(msg="Dice count less than 1, aborting...")
             return "Dice count less than 1, aborting roll"
             runIt = False
         elif (NoOfDice > 500):
-            log("Dice count greater than 500, aborting")
+            logging.error(msg="Dice count greater than 500, aborting")
             return "Dice count greater than 500. Please split into smaller rolls"
             runIt = False
 
         if (runIt == True):
             #Input is valid
-            log('s = ' + str(SidesOfDice) + ", m = " + str(Modifier) +
+            logging.info(msg='s = ' + str(SidesOfDice) + ", m = " + str(Modifier) +
                 ", n = " + str(NoOfDice))
 
             #If there's only 1 dice, no need to add up and give total
@@ -62,7 +82,7 @@ def rtd_cmd(sides, modifier, number):
                 #Do roll
                 rollRes = random.randint(1, SidesOfDice)
                 rollMod = rollRes + Modifier
-                log('Res = ' + str(rollMod))
+                logging.info(msg='Res = ' + str(rollMod))
 
                 if(SidesOfDice == 20 and rollRes == 1):
                     return "You rolled a nat 1 :(\n(With mod roll is a " + str(rollMod) + ")"
@@ -91,12 +111,12 @@ def rtd_cmd(sides, modifier, number):
 
                 #remove last 2 chars so that it doesn't look weird
                 rollStr = rollStr[:-2]
-                log('Res = ' + str(totalMod))
+                logging.info(msg='Res = ' + str(totalMod))
                 return 'Your rolls: ' + rollStr + '\n' + 'Your total is ' + str(totalMod) + '! (' + str(total) + '+' + str(Modifier) + ')'
 
     except Exception as e:
         #Catch exception
-        log('Exception occured, ' + str(e))
+        logging.info(msg='Exception occured, ' + str(e))
         #Tell the user to check their parameters
         return 'Something went wrong, did you type the parameters correctly?'
     
@@ -104,15 +124,15 @@ def rtd_cmd(sides, modifier, number):
     return 'Something went wrong'
 
 def calc_cmd(expression):
-    log("Expression = " + expression)
+    logging.info(msg="Expression = " + expression)
     res = str(eval(expression))
-    log("Result = " + res)
+    logging.info(msg="Result = " + res)
     return expression + " = " + res
 
 def adv_cmd(modifier, sides):
     #Input validation for sides of dice
     if (sides < 2):
-        log("Sides less than 2, aborting...")
+        logging.error(msg="Sides less than 2, aborting...")
         return "Sides less than 2, aborting roll"
         runIt = False
 
@@ -139,13 +159,13 @@ def adv_cmd(modifier, sides):
     else:
         responseStr += "You rolled a " + str(rollMod) + "! (" + str(rollRes) + "+" + str(modifier) + ")"
 
-    log('Res = ' + str(rollMod))
+    logging.info(msg='Res = ' + str(rollMod))
     return responseStr
 
 def dis_cmd(modifier, sides):
     #Input validation for sides of dice
     if (sides < 2):
-        log("Sides less than 2, aborting...")
+        logging.error(msg="Sides less than 2, aborting...")
         return "Sides less than 2, aborting roll"
         runIt = False
 
@@ -172,7 +192,7 @@ def dis_cmd(modifier, sides):
     else:
         responseStr = responseStr + "You rolled a " + str(rollRes + modifier) + "! (" + str(rollRes) + "+" + str(modifier) + ")"
 
-    log('Res = ' + str(rollMod))
+    logging.info(msg='Res = ' + str(rollMod))
 
     return responseStr    
 
@@ -197,7 +217,7 @@ def binTheDice_cmd():
 
 def validate_cmd(maxVal, verbose):
     if (maxVal < 1):
-        log("Max value less than 1, aborting...")
+        logging.error(msg="Max value less than 1, aborting...")
         return "Max value less than 1, aborting roll"
 
     checkList = [False for i in range(maxVal)]
@@ -218,51 +238,30 @@ def validate_cmd(maxVal, verbose):
         roll = random.randint(1, maxVal)
         if(verbose and checkList[roll - 1] == False):
             out += str(roll) + " was generated at try " + str(t) + "\n"
-            log(str(roll) + " was generated at try " + str(t))
+            logging.info(msg=str(roll) + " was generated at try " + str(t))
         checkList[roll - 1] = True
 
     if(success):
         tf = time.time_ns() - t0
         # Validated
-        log("Validated in " + str(tf / 100000000) + "s")
+        logging.info(msg="Validated in " + str(tf / 100000000) + "s")
         out += "Validated in " + str(tf / 100000000) + "s and " + str(t-1) + " tries\n"
 
     else:
         # Failed
-        log("Failed to validate")
+        logging.error(msg="Failed to validate")
         out += "Failed to validate"
 
     return out
-
-# Set up logging
-if LOG_TO_FILE:
-    log_handler = logging.basicConfig(format='%(asctime)s %(message)s', filename=LOG_FILE_NAME, encoding='utf-8', level=logging.INFO)
-else:
-    log_handler = logging.basicConfig(format='%(asctime)s %(message)s', encoding='utf-8', level=logging.INFO)
-
-# Try to import libraries
-try:
-    logging.info(msg="Importing libraries...")
-    # TODO: Add other needed libraries here
-    import discord
-    from discord import app_commands
-    from discord.ext import commands
-    
-except ImportError:
-    # Install requirements from requirements.txt, restart the script and exit
-    logging.error(msg="Failed to import libraries, installing requirements...")
-    subprocess.call(['python', '-m', 'pip', 'install', '-r', 'requirements.txt'])
-
-    # Restart the script
-    logging.info(msg="Restarting script...")
-    subprocess.call(['python', 'main.py'])
-    exit()
 
 # Bot class
 class Bot(commands.Bot):
     def __init__(self, prefix, intents):    
         logging.info(msg="Initializing bot...")
         super().__init__(command_prefix=prefix,intents=intents)
+
+    def getTree(self):
+        return self.tree
         
     async def setup_hook(self):
         logging.info(msg="Syncing commands...")
@@ -272,7 +271,6 @@ class Bot(commands.Bot):
     async def on_ready(self):
         # Log that the bot is ready
         logging.info(msg="Bot ready, logged in as " + self.user.name + "#" + self.user.discriminator)
-
 
 # Create some variables here that will get populated later
 intents = None
@@ -319,46 +317,58 @@ intents.message_content = True
 # Create the bot
 logging.info(msg="Creating bot...")
 client = Bot(prefix="!", intents=intents)
+client_tree = client.getTree()
 
-@client.tree.command(name="ping")
+@client_tree.command(name="ping")
 async def ping(interaction):
     await interaction.response.defer()
     await interaction.followup.send(content="Pong!")
 
-@client.tree.command(name="rtd")
+@client_tree.command(name="rtd")
 async def rtd(interaction, sides:typing.Optional[int] = 20, modifier:typing.Optional[int] = 0, number:typing.Optional[int] = 1):
     await interaction.response.defer()
     await interaction.followup.send(content=rtd_cmd(sides, modifier, number))
 
-@client.tree.command(name="adv")
+@client_tree.command(name="adv")
 async def adv(interaction, modifier:typing.Optional[int] = 0, sides:typing.Optional[int] = 20):
     await interaction.response.defer()
     await interaction.followup.send(content=adv_cmd(sides, modifier))
 
-@client.tree.command(name="dis")
+@client_tree.command(name="dis")
 async def dis(interaction, modifier:typing.Optional[int] = 0, sides:typing.Optional[int] = 20):
     await interaction.response.defer()
     await interaction.followup.send(content=dis_cmd(sides, modifier))
 
-@client.tree.command(name="bin_the_dice")
+@client_tree.command(name="bin_the_dice")
 async def bin(interaction):
     await interaction.response.defer()
     await interaction.followup.send(content=binTheDice_cmd())
 
-@client.tree.command(name="validate")
+@client_tree.command(name="validate")
 async def validate(interaction, max_val:typing.Optional[int] = 20, verbose:typing.Optional[bool] = False):
     await interaction.response.defer()
     await interaction.followup.send(content=validate_cmd(max_val, verbose))
 
-@client.tree.command(name="help")
+@client_tree.command(name="help")
 async def help(interaction):
     await interaction.response.defer()
     await interaction.followup.send(content=help_cmd())
 
-@client.tree.command(name="calc")
+@client_tree.command(name="calc")
 async def calc(interaction, expression:str):
     await interaction.response.defer()
     await interaction.followup.send(content=calc_cmd(expression))
+
+@client_tree.command(name='sync', description='Owner only')
+async def sync(interaction: discord.Interaction):
+    await interaction.response.defer()
+    logging.info('Sync command called')
+    if interaction.user.id == 262753744280616960:
+        await client_tree.sync()
+        logging.info('Command tree synced.')
+    else:
+        await interaction.followup.send('You must be the owner to use this command!')
+    await interaction.followup.send('Synced!')
 
 # Run the bot
 logging.info(msg="Running bot...")
