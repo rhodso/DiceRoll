@@ -129,7 +129,7 @@ def calc_cmd(expression):
     logging.info(msg="Result = " + res)
     return expression + " = " + res
 
-def adv_cmd(modifier, sides):
+def adv_cmd(sides, modifier):
     #Input validation for sides of dice
     if (sides < 2):
         logging.error(msg="Sides less than 2, aborting...")
@@ -162,7 +162,7 @@ def adv_cmd(modifier, sides):
     logging.info(msg='Res = ' + str(rollMod))
     return responseStr
 
-def dis_cmd(modifier, sides):
+def dis_cmd(sides, modifier):
     #Input validation for sides of dice
     if (sides < 2):
         logging.error(msg="Sides less than 2, aborting...")
