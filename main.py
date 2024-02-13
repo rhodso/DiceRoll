@@ -123,6 +123,10 @@ def rtd_cmd(sides, modifier, number):
     # Catch all
     return 'Something went wrong'
 
+def help_cmd():
+    # TODO: Write a help function
+    return ""    
+
 def calc_cmd(expression):
     logging.info(msg="Expression = " + expression)
     res = str(eval(expression))
