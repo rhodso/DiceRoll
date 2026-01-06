@@ -3,6 +3,7 @@ aiohttp==3.12.14
 aiosignal==1.4.0
 async-timeout==4.0.2
 attrs==22.2.0
+audioop-lts==0.2.2
 charset-normalizer==3.1.0
 discord.py==2.2.2
 frozenlist==1.8.0
